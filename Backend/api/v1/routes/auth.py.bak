@@ -1,0 +1,188 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+from typing import Dict
+import jwt
+import re
+import logging
+import sys
+import os
+
+# Add project root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+
+from api.v1.dependencies.database import get_db
+from models.user import User
+from api.v1.core.config import settings
+
+router = APIRouter(tags=["Authentication"])
+security = HTTPBearer()
+logger = logging.getLogger(__name__)
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> Dict:
+    """Get current authenticated user"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(
+            token, 
+            settings.SECRET_KEY, 
+            algorithms=[settings.ALGORITHM]
+        )
+        user_id = int(payload.get("sub"))
+        
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="User not found"
+            )
+        
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role,
+            "profile_image": getattr(user, 'profile_image', None)
+        }
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e)
+        )
+
+@router.post("/login")
+async def login(
+    username: str,
+    password: str,
+    db: Session = Depends(get_db)
+):
+    """Login endpoint - returns JWT token"""
+    try:
+        # Find user
+        user = db.query(User).filter(
+            (User.username == username) | (User.email == username)
+        ).first()
+        
+        if not user or user.password != password:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        # Create token
+        token_data = {
+            "sub": str(user.id),
+            "username": user.username,
+            "exp": datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        }
+        token = jwt.encode(token_data, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/profile")
+async def get_profile(
+    current_user: Dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get current user profile"""
+    try:
+        user = db.query(User).filter(User.id == current_user["id"]).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role,
+            "profile_image": getattr(user, 'profile_image', None),
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+            "updated_at": user.updated_at.isoformat() if user.updated_at else None
+        }
+    except Exception as e:
+        logger.error(f"Profile error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/upload-profile-image")
+async def upload_profile_image(
+    image_data: dict,
+    current_user: Dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Upload profile image"""
+    try:
+        user = db.query(User).filter(User.id == current_user["id"]).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        base64_image = image_data.get('image_data')
+        if not base64_image:
+            raise HTTPException(status_code=400, detail="No image data provided")
+        
+        # Validate base64 format
+        pattern = r'^data:image/(png|jpeg|jpg|gif);base64,'
+        if not re.match(pattern, base64_image):
+            raise HTTPException(status_code=400, detail="Invalid image format")
+        
+        # Update user profile image
+        user.profile_image = base64_image
+        user.updated_at = datetime.utcnow()
+        
+        db.commit()
+        db.refresh(user)
+        
+        return {
+            "message": "Profile image uploaded successfully",
+            "profile_image": user.profile_image
+        }
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/delete-profile-image")
+async def delete_profile_image(
+    current_user: Dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete profile image"""
+    try:
+        user = db.query(User).filter(User.id == current_user["id"]).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user.profile_image = None
+        user.updated_at = datetime.utcnow()
+        
+        db.commit()
+        
+        return {"message": "Profile image deleted successfully"}
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Delete error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
