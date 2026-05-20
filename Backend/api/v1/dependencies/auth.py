@@ -40,6 +40,30 @@ def get_current_user(
                 "full_name": user[3],
                 "role": "admin"
             }
+        elif role == "teacher":
+            query = text("""
+                SELECT id, first_name, last_name, email, registration_number, 
+                       department_id, course, is_active,
+                       CONCAT(first_name, ' ', last_name) as full_name
+                FROM teachers WHERE id = :id
+            """)
+            user = db.execute(query, {"id": user_id}).first()
+            if not user:
+                raise HTTPException(status_code=401, detail="Teacher not found")
+            if not user[7]:
+                raise HTTPException(status_code=401, detail="Teacher account disabled")
+            return {
+                "id": user[0],
+                "first_name": user[1],
+                "last_name": user[2],
+                "email": user[3],
+                "registration_number": user[4],
+                "department_id": user[5],
+                "course": user[6],
+                "is_active": bool(user[7]),
+                "full_name": user[8],
+                "role": "teacher"
+            }
         elif role == "student":
             query = text("""
                 SELECT id, email, CONCAT(first_name, ' ', last_name) as full_name 
@@ -53,6 +77,30 @@ def get_current_user(
                 "email": user[1],
                 "full_name": user[2],
                 "role": "student"
+            }
+        elif role == "staff":
+            query = text("""
+                SELECT id, first_name, last_name, email, staff_number, 
+                       position, role, is_active,
+                       CONCAT(first_name, ' ', last_name) as full_name
+                FROM staff WHERE id = :id
+            """)
+            user = db.execute(query, {"id": user_id}).first()
+            if not user:
+                raise HTTPException(status_code=401, detail="Staff not found")
+            if not user[7]:
+                raise HTTPException(status_code=401, detail="Staff account disabled")
+            return {
+                "id": user[0],
+                "first_name": user[1],
+                "last_name": user[2],
+                "email": user[3],
+                "staff_number": user[4],
+                "position": user[5],
+                "staff_role": user[6],
+                "is_active": bool(user[7]),
+                "full_name": user[8],
+                "role": "staff"
             }
         else:
             raise HTTPException(status_code=401, detail=f"Unknown role: {role}")
@@ -69,7 +117,7 @@ def require_role(allowed_roles: List[str]):
         if current_user["role"] not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. Required roles: {', '.join(allowed_roles)}"
+                detail=f"Access denied. Required roles: {', '.join(allowed_roles)}. Your role: {current_user['role']}"
             )
         return current_user
     return role_checker

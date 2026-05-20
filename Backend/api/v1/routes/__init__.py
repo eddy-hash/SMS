@@ -11,6 +11,7 @@ from .analytics import router as analytics_router
 from .profile_image import router as profile_image_router
 from .announcements import router as announcements_router
 from .staff import router as staff_router
+from .teachers import router as teachers_router
 
 __all__ = [
     'auth_router',
@@ -25,5 +26,6 @@ __all__ = [
     'analytics_router',
     'profile_image_router',
     'announcements_router',
-    'staff_router'
+    'staff_router',
+    'teachers_router'
 ]

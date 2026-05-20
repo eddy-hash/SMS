@@ -75,8 +75,8 @@ const TeacherChangePassword = () => {
     toast.success(
       (t) => (
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <CheckCircleIcon className="h-5 w-5 text-blue-600" />
+          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+            <CheckCircleIcon className="h-5 w-5 text-green-600" />
           </div>
           <div>
             <p className="font-semibold text-gray-800">Password Changed!</p>
@@ -117,7 +117,7 @@ const TeacherChangePassword = () => {
 
     setLoading(true);
     try {
-      await api.put('/students/password/change-password', {
+      await api.put('/teacher/password/change-password', {
         current_password: formData.current_password,
         new_password: formData.new_password
       });
@@ -135,7 +135,7 @@ const TeacherChangePassword = () => {
   if (!user) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
       </div>
     );
   }
@@ -145,18 +145,19 @@ const TeacherChangePassword = () => {
       <div className="max-w-md mx-auto px-4">
         <div className="flex items-center justify-center gap-2 mb-6">
           
-          <h1 className="text-xl font-bold text-blue-600">Welcome, change your Password here!</h1>
+          <h1 className="text-xl font-bold text-green-600">Welcome, change your Password here!</h1>
         </div>
 
+        {/* Teacher Info Card */}
         <div className="bg-white rounded-lg shadow p-4 mb-6 flex items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <UserCircleIcon className="h-8 w-8 text-blue-600" />
+          <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+            <UserCircleIcon className="h-8 w-8 text-emerald-600" />
           </div>
           <div>
             <p className="text-sm text-gray-500">Logged in as</p>
             <p className="font-semibold text-gray-800">{user?.full_name || user?.username}</p>
             <p className="text-xs text-gray-500">{user?.email}</p>
-            <p className="text-xs text-blue-600 capitalize mt-1">Role: {user?.role}</p>
+            <p className="text-xs text-emerald-600 capitalize mt-1">Role: {user?.role}</p>
           </div>
         </div>
 
@@ -211,7 +212,7 @@ const TeacherChangePassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+            className="w-full bg-emerald-600 text-white py-2.5 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

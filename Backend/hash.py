@@ -11,7 +11,7 @@ class hashing(BaseModel):
       password: str
       hashed_password: str
 
-password = 'student123'   
+password = 'marry@123'   
 
 hashed_password = pwd_context.hash(password)
 

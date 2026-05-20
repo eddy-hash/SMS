@@ -12,6 +12,7 @@ import {
 
 import Sidebar from "../components/layout/Sidebar";           
 import StudentSidebar from "../components/layout/StudentSidebar"; 
+import TeacherSidebar from "../components/layout/TeacherSidebar"; // Create this
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import ProfileImage from '../components/common/ProfileImage';
@@ -37,6 +38,7 @@ const DashboardLayout = () => {
 
   const isAdmin = user?.role === 'admin' || user?.role === 'principal';
   const isStudent = user?.role === 'student';
+  const isTeacher = user?.role === 'teacher'; // Add this
 
   const handleLogout = async () => {
     await logout();
@@ -100,7 +102,6 @@ const DashboardLayout = () => {
   }, []);
 
   const getPageTitle = () => {
-    
     const adminTitles = {
       "/dashboard": "Dashboard",
       "/students": "Student Management",
@@ -109,7 +110,7 @@ const DashboardLayout = () => {
       "/departments": "Department Management",
       "/announcements": "Reports & Announcements",
     };
-   
+    
     const studentTitles = {
       "/student/dashboard": "Student Dashboard",
       "/student/profile": "My Profile",
@@ -124,8 +125,21 @@ const DashboardLayout = () => {
       "/student/registration/sem2": "Semester 2 Registration",
     };
 
+    const teacherTitles = {
+      "/teacher": "Teacher Dashboard",
+      "/teacher/results": "Manage Results",
+      "/teacher/students": "My Students",
+      "/teacher/attendance": "Attendance Management",
+      "/teacher/courses": "My Courses",
+      "/teacher/profile": "My Profile",
+      "/teacher/change-password": "Change Password",
+    };
+
     if (isStudent) {
       return studentTitles[location.pathname] || "Student Portal";
+    }
+    if (isTeacher) {
+      return teacherTitles[location.pathname] || "Teacher Portal";
     }
     return adminTitles[location.pathname] || "East Africa University";
   };
@@ -144,6 +158,7 @@ const DashboardLayout = () => {
 
   const getUserRole = () => {
     if (isStudent) return "Student";
+    if (isTeacher) return "Teacher";
     return user?.role || user?.user_type || "Administrator";
   };
 
@@ -162,11 +177,16 @@ const DashboardLayout = () => {
     }
   };
 
-  const CurrentSidebar = isStudent ? StudentSidebar : Sidebar;
+  // Choose sidebar based on role
+  let CurrentSidebar = Sidebar;
+  if (isStudent) {
+    CurrentSidebar = StudentSidebar;
+  } else if (isTeacher) {
+    CurrentSidebar = TeacherSidebar;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-   
       <CurrentSidebar sidebarOpen={sidebarOpen} />
 
       <div className={`${sidebarOpen ? "lg:ml-72" : "lg:ml-20"} transition-all`}>
@@ -324,7 +344,7 @@ const DashboardLayout = () => {
                         <button
                           onClick={() => {
                             setShowProfileMenu(false);
-                            navigate(isStudent ? "/student/profile" : "/profile");
+                            navigate(isStudent ? "/student/profile" : isTeacher ? "/teacher/profile" : "/profile");
                           }}
                           className="flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
@@ -334,7 +354,7 @@ const DashboardLayout = () => {
                         <button
                           onClick={() => {
                             setShowProfileMenu(false);
-                            navigate(isStudent ? "/student/change-password" : "/settings");
+                            navigate(isStudent ? "/student/change-password" : isTeacher ? "/teacher/change-password" : "/settings");
                           }}
                           className="flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
