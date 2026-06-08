@@ -396,7 +396,6 @@ async def register_electives(
         raise HTTPException(403, "Access denied")
     student_id = current_user.get("user_id") or current_user.get("id")
     
-    # Replace existing registrations for this semester
     db.execute(text("DELETE FROM enrollments WHERE student_id = :sid AND semester = :sem"), 
                {"sid": student_id, "sem": payload.semester})
     for cid in payload.elective_ids:

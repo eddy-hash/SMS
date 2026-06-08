@@ -69,9 +69,11 @@ from api.v1.routes.students.update import router as student_update_router
 from api.v1.routes.student_dashboard import router as student_dashboard_router
 from api.v1.routes.students.result import router as student_result_router
 from api.v1.routes.students.create import router as student_create_router
+from api.v1.routes.students.delete import router as student_delete_router
 from api.v1.routes.students.change_password import router as student_change_password_router
 
-app.include_router(student_update_router, prefix="/api/v1")
+app.include_router(student_update_router, prefix="/api/v1/students")
+app.include_router(student_delete_router, prefix="/api/v1/students")
 app.include_router(student_dashboard_router, prefix="/api/v1")
 app.include_router(student_result_router, prefix="/api/v1")
 app.include_router(student_create_router, prefix="/api/v1/students")

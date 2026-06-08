@@ -48,14 +48,19 @@ const StudentTable = ({
     return map;
   }, [courses]);
 
+
   const getDepartmentName = (student) => {
-    if (!student) return "Unassigned";
-    if (student.department_name && student.department_name !== "Unassigned")
-      return student.department_name;
-    if (student.department_id && departmentMap[student.department_id])
-      return departmentMap[student.department_id];
-    return "Unassigned";
-  };
+  if (!student) return "Unassigned";
+
+  const id = String(student.department_id || "unassigned");
+
+  if (student.department_name && student.department_name !== "Unassigned")
+    return student.department_name;
+
+  if (departmentMap[id]) return departmentMap[id];
+
+  return "Unassigned";
+};
 
   // ✅ FIX: Use student.course_name if available (from backend join)
   const getCourseName = (student) => {
@@ -78,7 +83,7 @@ const StudentTable = ({
     return Object.values(map).sort((a, b) =>
       String(a.id).localeCompare(String(b.id))
     );
-  }, [students, departments]);
+  }, [students, departmentMap]);
 
   const filtered = useMemo(() => {
     if (selectedDept === "all") return students;

@@ -13,7 +13,7 @@ from api.v1.dependencies.auth import require_teacher, require_student
 
 router = APIRouter(prefix="/results", tags=["Results"])
 
-@router.get("/students/list")
+@router.get("/student/list")
 async def get_all_results(
     student_id: Optional[int] = Query(None),
     course_id: Optional[int] = Query(None),

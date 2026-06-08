@@ -8,7 +8,6 @@ from datetime import datetime
 from api.v1.core.config import settings
 from api.v1.core.database import get_db
 
-# ============ ROLE DEFINITIONS ============
 
 class Roles:
     STUDENT = "student"

@@ -38,7 +38,7 @@ const DashboardLayout = () => {
 
   const isAdmin = user?.role === 'admin' || user?.role === 'principal';
   const isStudent = user?.role === 'student';
-  const isTeacher = user?.role === 'teacher'; // Add this
+  const isTeacher = user?.role === 'teacher'; 
 
   const handleLogout = async () => {
     await logout();
@@ -177,7 +177,7 @@ const DashboardLayout = () => {
     }
   };
 
-  // Choose sidebar based on role
+  
   let CurrentSidebar = Sidebar;
   if (isStudent) {
     CurrentSidebar = StudentSidebar;
@@ -226,11 +226,11 @@ const DashboardLayout = () => {
                 {isAdmin && (
                   <button
                     onClick={() => setShowCreateModal(true)}
-                    className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                    className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                     title="Create Notification"
                   >
                     <BellIcon className="h-4 w-4" />
-                    <span className="hidden sm:inline">Notify</span>
+                    <span className="hidden sm:inline font-bold">Notify</span>
                   </button>
                 )}
 

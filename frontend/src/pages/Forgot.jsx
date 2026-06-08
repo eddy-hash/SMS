@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EnvelopeIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, ArrowLeftIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 export default function Forgot() {
@@ -66,9 +66,7 @@ export default function Forgot() {
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM9 12h6m-6 4h6m-3-8v12m0 0L9 16m3 4l3-4" />
-            </svg>
+            <LockClosedIcon className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-800">Forgot Password?</h2>
           <p className="text-gray-500 mt-2">Enter your email address and we'll send you a link to reset your password.</p>

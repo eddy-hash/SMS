@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+import { UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon, UserPlusIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import toast from "react-hot-toast";
 import logo from '../assets/logo.png';
 
@@ -202,14 +202,17 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="login-btn w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+              className="login-btn w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ?
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   Signing in...
                 </div> :
-                "Sign In"
+                <>
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                  Sign In
+                </>
               }
             </button>
           </form>
